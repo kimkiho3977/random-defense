@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import type { Page, DefenseSettings, DefenseProblem } from './types';
 import { useLocalStorage } from './hooks/useLocalStorage';
-import { fetchProblems, checkHandle } from './api/solvedac';
+import { fetchProblemsWithFallback, checkHandle } from './api/solvedac';
 import { getTierRange } from './utils/tier';
 import SettingPage from './components/SettingPage';
 import DefensePage from './components/DefensePage';
@@ -20,7 +20,6 @@ const DEFAULT_SETTINGS: DefenseSettings = {
   timeLimit: 120,
   distributeByTag: true,
   distributeByTier: true,
-  hideTier: false,
 };
 
 function shuffle<T>(array: T[]): T[] {
@@ -46,7 +45,6 @@ export default function App() {
     setLoading(true);
 
     try {
-      // 핸들 체크
       if (settings.handle) {
         const valid = await checkHandle(settings.handle);
         if (!valid) {
@@ -64,6 +62,7 @@ export default function App() {
 
       const selectedProblems: DefenseProblem[] = [];
       const usedProblemIds = new Set<number>();
+      const failedTags: string[] = [];
 
       // 태그 배분
       let tagAssignments: string[] = [];
@@ -94,42 +93,71 @@ export default function App() {
         const tag = tagAssignments[i];
         const tier = tierRanges[i];
 
-        const problems = await fetchProblems(
-          tag,
-          tier.min,
-          tier.max,
-          settings.handle || undefined,
-          settings.solvedMin,
-          settings.solvedMax
+        const problem = await fetchProblemsWithFallback(
+          {
+            tag,
+            tierMin: tier.min,
+            tierMax: tier.max,
+            handle: settings.handle || undefined,
+            solvedMin: settings.solvedMin,
+            solvedMax: settings.solvedMax,
+            rateMin: settings.rateMin,
+            rateMax: settings.rateMax,
+          },
+          usedProblemIds
         );
 
-        // 정답률 필터링
-        const filtered = problems.filter(p => {
-          const rate = 100 / p.averageTries;
-          return (
-            rate >= settings.rateMin &&
-            rate <= settings.rateMax &&
-            !usedProblemIds.has(p.problemId)
-          );
-        });
-
-        if (filtered.length === 0) {
-          setError(`조건에 맞는 문제가 부족합니다 (${tag})`);
-          setLoading(false);
-          return;
+        if (problem) {
+          usedProblemIds.add(problem.problemId);
+          selectedProblems.push({
+            ...problem,
+            tagKey: tag,
+            completed: false,
+          });
+        } else {
+          failedTags.push(tag);
         }
-
-        const selected = filtered[Math.floor(Math.random() * filtered.length)];
-        usedProblemIds.add(selected.problemId);
-        
-        selectedProblems.push({
-          ...selected,
-          tagKey: tag,
-          completed: false,
-        });
       }
 
-      setProblems(selectedProblems);
+      // 실패한 태그가 있으면 다른 태그로 대체 시도
+      for (const failedTag of failedTags) {
+        const otherTags = settings.tags.filter(t => t !== failedTag);
+        if (otherTags.length === 0) continue;
+
+        for (const altTag of otherTags) {
+          const problem = await fetchProblemsWithFallback(
+            {
+              tag: altTag,
+              tierMin: settings.tierMin,
+              tierMax: settings.tierMax,
+              handle: settings.handle || undefined,
+              solvedMin: settings.solvedMin,
+              solvedMax: settings.solvedMax,
+              rateMin: settings.rateMin,
+              rateMax: settings.rateMax,
+            },
+            usedProblemIds
+          );
+
+          if (problem) {
+            usedProblemIds.add(problem.problemId);
+            selectedProblems.push({
+              ...problem,
+              tagKey: altTag,
+              completed: false,
+            });
+            break;
+          }
+        }
+      }
+
+      if (selectedProblems.length === 0) {
+        setError('조건에 맞는 문제를 찾을 수 없습니다. 조건을 완화해주세요.');
+        setLoading(false);
+        return;
+      }
+
+      setProblems(shuffle(selectedProblems));
       startTimeRef.current = Date.now();
       setPage('defense');
     } catch {

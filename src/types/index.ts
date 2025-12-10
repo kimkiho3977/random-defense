@@ -25,7 +25,6 @@ export interface DefenseSettings {
   timeLimit: number | null;
   distributeByTag: boolean;
   distributeByTier: boolean;
-  hideTier: boolean;
 }
 
 export interface DefenseProblem extends Problem {

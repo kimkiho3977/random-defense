@@ -180,15 +180,6 @@ export default function SettingPage({ settings, onChange, onStart, loading, erro
             />
             <span>난이도 균등 배분</span>
           </label>
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={settings.hideTier}
-              onChange={e => update('hideTier', e.target.checked)}
-              className="w-4 h-4"
-            />
-            <span>난이도 숨기기</span>
-          </label>
         </div>
 
         {/* 에러 메시지 */}

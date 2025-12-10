@@ -105,22 +105,20 @@ export default function DefensePage({ problems, settings, onComplete, onBack }: 
 
             {/* 추가 정보 (펼쳤을 때만 보임) */}
             {expandedIndex === index && (
-              <div className="mt-3 pt-3 border-t border-gray-200 flex items-center gap-3 text-sm">
+            <div className="mt-3 pt-3 border-t border-gray-200 flex items-center gap-3 text-sm">
                 <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
-                  {problem.tagKey}
+                {problem.tagKey}
                 </span>
-                {!settings.hideTier && (
-                  <span style={{ color: getTierColor(problem.level) }} className="font-medium">
-                    ⭐ {getTierLabel(problem.level)}
-                  </span>
-                )}
-                <span className="text-gray-500">
-                  정답률 {accuracyRate(problem)}%
+                <span style={{ color: getTierColor(problem.level) }} className="font-medium">
+                ⭐ {getTierLabel(problem.level)}
                 </span>
                 <span className="text-gray-500">
-                  {problem.acceptedUserCount.toLocaleString()}명 solved
+                정답률 {accuracyRate(problem)}%
                 </span>
-              </div>
+                <span className="text-gray-500">
+                {problem.acceptedUserCount.toLocaleString()}명 solved
+                </span>
+            </div>
             )}
           </div>
         ))}
