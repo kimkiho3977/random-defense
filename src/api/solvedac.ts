@@ -4,10 +4,23 @@ const PROXY = 'https://corsproxy.io/?';
 const BASE_URL = 'https://solved.ac/api/v3';
 
 export async function fetchTags(): Promise<Tag[]> {
-  const res = await fetch(`${PROXY}${encodeURIComponent(`${BASE_URL}/tag/list?page=1`)}`);
-  if (!res.ok) throw new Error('태그 목록을 불러오지 못했습니다');
-  const data = await res.json();
-  return data.items;
+  const allTags: Tag[] = [];
+  let page = 1;
+  
+  while (true) {
+    const res = await fetch(`${PROXY}${encodeURIComponent(`${BASE_URL}/tag/list?page=${page}`)}`);
+    if (!res.ok) throw new Error('태그 목록을 불러오지 못했습니다');
+    const data = await res.json();
+    
+    if (data.items.length === 0) break;
+    
+    allTags.push(...data.items);
+    page++;
+    
+    if (page > 10) break; // 안전장치
+  }
+  
+  return allTags;
 }
 
 export async function fetchProblems(
