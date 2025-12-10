@@ -1,73 +1,23 @@
-# React + TypeScript + Vite
+# 🎯 랜덤 디펜스
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+solved.ac API를 활용한 백준 알고리즘 문제 랜덤 출제 도구
 
-Currently, two official plugins are available:
+## 기능
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **유형 태그**: 검색으로 원하는 알고리즘 태그 다중 선택
+- **난이도 범위**: 실버5 ~ 플래티넘3
+- **안 푼 문제만**: solved.ac 핸들 입력 시 내가 안 푼 문제만 출제
+- **푼 사람 수 필터**: 최소 ~ 최대 명수 지정
+- **정답률 필터**: 최소 ~ 최대 % 지정
+- **균등 배분**: 유형별 / 난이도별 고르게 출제
+- **난이도 숨기기**: 블라인드 디펜스 가능
+- **제한 시간**: 직접 설정 + 타이머 표시
+- **설정 저장**: 마지막 설정 자동 기억
 
-## React Compiler
+## 사용법
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+1. solved.ac 핸들 입력 (선택)
+2. 문제 수, 난이도, 태그 설정
+3. 디펜스 시작
+4. 백준에서 문제 풀고 완료 체크
+5. 디펜스 종료 후 결과 확인
